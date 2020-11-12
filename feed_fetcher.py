@@ -1,6 +1,8 @@
 from config_loader import ConfigLoader
 import urllib.request
+import urllib.error
 import feedparser
+
 
 class FeedFetcher:
     class Inaccessible(Exception):
@@ -14,7 +16,7 @@ class FeedFetcher:
 
     def fetch(self, attempt: int = 0) -> feedparser.FeedParserDict:
         if attempt > 2:
-            print("stopping fetching")
+            return feedparser.FeedParserDict()
         opener = urllib.request.build_opener(self.auth)
         try:
             data = opener.open(self.config.get_url())
@@ -23,8 +25,8 @@ class FeedFetcher:
                 raise self.Inaccessible()
             # Basic realm="ILIAS Newsfeed"
             realm = err.headers['WWW-Authenticate'].split('"')[1]
-            print(realm)
-            self.auth.add_password(realm=realm, uri=self.config.get_uri(), user=self.config.get_username(), passwd=self.config.get_password())
+            self.auth.add_password(realm=realm, uri=self.config.get_uri(), user=self.config.get_username(),
+                                   passwd=self.config.get_password())
             return self.fetch(attempt + 1)
         feed = feedparser.parse(data)
         return feed
