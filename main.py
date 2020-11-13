@@ -8,19 +8,18 @@ import time
 def main():
     config = ConfigLoader('config.ini')
     feed_fetcher = FeedFetcher(config)
-    results = feed_fetcher.poll()
+    # initial poll to get most recent alert id
+    feed_fetcher.poll()
+
     mail = MailSender(config)
-    # mail.mail_entry(results[0])
 
     def job():
-        print('running job')
         new_results = feed_fetcher.poll_new()
-        print(new_results)
-        for result in new_results.reverse():
+        new_results.reverse()
+        for result in new_results:
             mail.mail_entry(result)
 
     schedule.every(config.get_interval()).minutes.do(job)
-    print('waiting for scheduled jobs')
     while True:
         schedule.run_pending()
         time.sleep(5)
