@@ -3,9 +3,11 @@
 </head>
 <body>
     <u>New ilias alert:</u> <a href="{{link}}">{{title}}</a><br/>
+    {% if body is defined and body|length %}
     <br/>
     <div style="border-left: 6px solid #2196f3;background-color: #b0e5ff;padding: 0.7em">
         {{body}}
     </div>
+    {% endif %}
 </body>
 </html>
