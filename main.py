@@ -14,10 +14,13 @@ def main():
     mail = MailSender(config)
 
     def job():
-        new_results = feed_fetcher.poll_new()
-        new_results.reverse()
-        for result in new_results:
-            mail.mail_entry(result)
+        try:
+            new_results = feed_fetcher.poll_new()
+            new_results.reverse()
+            for result in new_results:
+                mail.mail_entry(result)
+        except FeedFetcher.Inaccessible:
+            print('failed to load feed, deferring to next interval')
 
     schedule.every(config.get_interval()).minutes.do(job)
     while True:

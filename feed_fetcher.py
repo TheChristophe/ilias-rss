@@ -15,11 +15,12 @@ class FeedFetcher:
         self.newest_entry = ''
 
     def fetch(self, attempt: int = 0) -> feedparser.FeedParserDict:
-        if attempt > 2:
-            return feedparser.FeedParserDict()
+        if attempt >= 3:
+            raise self.Inaccessible()
         opener = urllib.request.build_opener(self.auth)
         try:
-            data = opener.open(self.config.get_url())
+            # use a huge timeout as ilias RSS is likely to hang
+            data = opener.open(self.config.get_url(), timeout=300)
         except urllib.error.HTTPError as err:
             if err.code != 401 or 'WWW-Authenticate' not in err.headers:
                 raise self.Inaccessible()
@@ -28,6 +29,9 @@ class FeedFetcher:
             self.auth.add_password(realm=realm, uri=self.config.get_uri(), user=self.config.get_username(),
                                    passwd=self.config.get_password())
             return self.fetch(attempt + 1)
+        except urllib.error.URLError as err:
+            if 'timed out' in err.reason:
+                return self.fetch(attempt + 1)
         feed = feedparser.parse(data)
         return feed
 
