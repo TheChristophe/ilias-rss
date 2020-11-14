@@ -9,9 +9,6 @@ import jinja2
 class MailSender:
     def __init__(self, config: ConfigLoader):
         self.config = config
-        self.smtp = smtplib.SMTP(config.get_mail_host())
-        self.smtp.starttls()
-        self.smtp.login(config.get_mail_username(), config.get_mail_password())
         self.jinja = jinja2.Environment(loader=jinja2.FileSystemLoader('.'))
 
     def _new_mail(self, subject: str):
@@ -21,17 +18,29 @@ class MailSender:
         multipart['Subject'] = subject
         return multipart
 
+    def _init_smtp(self):
+        self.smtp = smtplib.SMTP(self.config.get_mail_host())
+        self.smtp.starttls()
+        self.smtp.login(self.config.get_mail_username(), self.config.get_mail_password())
+
+    def _finalize_smtp(self):
+        self.smtp.quit()
+
     def send_mail(self, message: str, subject: str = 'Notification'):
         multipart = self._new_mail(subject)
 
         multipart.attach(MIMEText(message, 'plain'))
+        self._init_smtp()
         self.smtp.send_message(multipart)
+        self._finalize_smtp()
 
     def send_mail_html(self, html_message: str, subject: str = 'Notification'):
         multipart = self._new_mail(subject)
 
         multipart.attach(MIMEText(html_message, 'html'))
+        self._init_smtp()
         self.smtp.send_message(multipart)
+        self._finalize_smtp()
 
     def mail_entry(self, entry: dict):
         title = entry['title']
