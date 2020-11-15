@@ -1,0 +1,23 @@
+[Credentials]
+; your ilias private RSS feed username and password
+username = SET_THIS_FIELD
+password = SET_THIS_FIELD
+; the url to your private RSS feed
+url = SET_THIS_FIELD
+
+[Mail]
+; configure SMTP server address
+; this application uses STARTTLS (port 587 by default)
+host = smtp.example.com
+port = 587
+; sender address to display
+from = email-sender@example.com
+; destination address
+to = email-receiver@example.com
+; SMTP credentials
+username = email-sender@example.com
+password = longPasswordWithMuchEntropy
+
+[Misc]
+; how often to poll RSS, in minutes
+interval = 30

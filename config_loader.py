@@ -17,8 +17,7 @@ class ConfigLoader:
 
         self.username = self.config['Credentials']['username']
         self.password = self.config['Credentials']['password']
-
-        self.url = self.config['Location']['url']
+        self.url = self.config['Credentials']['url']
         self.uri = urllib.parse.urlparse(self.url).netloc
 
         self.mail_host = self.config['Mail']['host']
@@ -38,14 +37,10 @@ class ConfigLoader:
 
     def check_keys(self):
         needed_auth_keys = ['username', 'password']
-        needed_connect_keys = ['url']
         needed_mail_keys = ['username', 'password', 'from', 'to', 'host', 'port']
         needed_misc_keys = ['interval']
         for key in needed_auth_keys:
             if key not in self.config['Credentials']:
-                raise self.KeyNotFound(key)
-        for key in needed_connect_keys:
-            if key not in self.config['Location']:
                 raise self.KeyNotFound(key)
         for key in needed_mail_keys:
             if key not in self.config['Mail']:
