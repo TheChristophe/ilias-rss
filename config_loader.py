@@ -30,7 +30,7 @@ class ConfigLoader:
         self.interval = int(self.config['Misc']['interval'])
 
     def check_sections(self):
-        needed_sections = ['Credentials', 'Location', 'Mail', 'Misc']
+        needed_sections = ['Credentials', 'Mail', 'Misc']
         for section in needed_sections:
             if section not in self.config:
                 raise self.SectionNotFound(section)
