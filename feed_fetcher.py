@@ -32,6 +32,8 @@ class FeedFetcher:
         except urllib.error.URLError as err:
             if 'timed out' in err.reason:
                 return self.fetch(attempt + 1)
+        except ConnectionRefusedError as err:
+            raise self.Inaccessible()
         feed = feedparser.parse(data)
         return feed
 
