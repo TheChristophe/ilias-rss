@@ -19,7 +19,7 @@ class MailSender:
         return multipart
 
     def _init_smtp(self):
-        self.smtp = smtplib.SMTP(self.config.get_mail_host())
+        self.smtp = smtplib.SMTP(self.config.get_mail_host(), self.config.get_mail_port())
         self.smtp.starttls()
         self.smtp.login(self.config.get_mail_username(), self.config.get_mail_password())
 
