@@ -34,6 +34,11 @@ class FeedFetcher:
                 return self.fetch(attempt + 1)
         except ConnectionRefusedError as err:
             raise self.Inaccessible()
+        except ConnectionError as e:
+            return self.fetch(attempt + 1)
+        except Exception as e:
+            return self.fetch(attempt + 1)
+
         feed = feedparser.parse(data)
         return feed
 
