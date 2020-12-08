@@ -30,8 +30,7 @@ class FeedFetcher:
                                    passwd=self.config.get_password())
             return self.fetch(attempt + 1)
         except urllib.error.URLError as err:
-            if 'timed out' in err.reason:
-                return self.fetch(attempt + 1)
+            return self.fetch(attempt + 1)
         except ConnectionRefusedError as err:
             raise self.Inaccessible()
         except ConnectionError as e:
