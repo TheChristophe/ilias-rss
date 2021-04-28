@@ -10,5 +10,3 @@ How to use:
 2. (Optional) Set up venv `python -m venv venv`, `. ./venv/bin/activate`
 3. Install requirements `pip install -r requirements.txt`
 4. Run with `python main.py`, optionally in tmux or in a service
-
-This application only produces output when the RSS is unavailable.
