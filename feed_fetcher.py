@@ -1,3 +1,5 @@
+import socket
+
 from config_loader import ConfigLoader
 import urllib.request
 import urllib.error
@@ -17,8 +19,6 @@ class FeedFetcher:
     def fetch(self, attempt: int = 0) -> feedparser.FeedParserDict:
         if attempt >= 3:
             raise self.Inaccessible()
-        elif attempt > 0:
-            print(f"Retrying for {attempt + 1}th time...")
         opener = urllib.request.build_opener(self.auth)
         try:
             # use a huge timeout as ilias RSS is likely to hang
@@ -27,19 +27,25 @@ class FeedFetcher:
             if err.code != 401 or 'WWW-Authenticate' not in err.headers:
                 raise self.Inaccessible()
             # Basic realm="ILIAS Newsfeed"
-            print("Failed, setting up authentication...")
+            print("Failed, retrying with authentication...")
             realm = err.headers['WWW-Authenticate'].split('"')[1]
             self.auth.add_password(realm=realm, uri=self.config.get_uri(), user=self.config.get_username(),
                                    passwd=self.config.get_password())
             return self.fetch(attempt + 1)
         except urllib.error.URLError as err:
+            print("URLError, retrying...")
             return self.fetch(attempt + 1)
         except ConnectionRefusedError as err:
             raise self.Inaccessible()
         except (ConnectionError, Exception) as e:
+            print("Unknown error, retrying...")
             return self.fetch(attempt + 1)
 
-        feed = feedparser.parse(data)
+        try:
+            feed = feedparser.parse(data)
+        except socket.timeout:
+            print("Failed to parse feed, retrying...")
+            return self.fetch(attempt + 1)
         return feed
 
     def poll(self):
